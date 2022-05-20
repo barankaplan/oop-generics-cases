@@ -1,0 +1,246 @@
+/*----------------------------------------------------------------------------------------------------------------------
+	Generic açılımlar temel türlerle yapılamaz
+----------------------------------------------------------------------------------------------------------------------*/
+
+
+/*----------------------------------------------------------------------------------------------------------------------
+	Yukarıdaki problem sarmalayan sınıflar ile açılım yapılarak çözülebilir. Yani generic parametre olarak temel türlerin
+	kullanılacağı generic bir sınıf (veya metot) için sarmalayan sınıflar açılımda kullanılmalıdır
+----------------------------------------------------------------------------------------------------------------------*/
+/*----------------------------------------------------------------------------------------------------------------------
+	Java 7 ile birlikte new operatörü ile açılım yapılırken türler yazılmayabilir. Ancak açısal parantezler olmalıdır
+	(diamond syntax). Şüphesiz olmaması bir sentaks ya da semantic bir hata oluşturmaz. Ancak kesinlikle kullanımı
+	tavsiye edilir
+----------------------------------------------------------------------------------------------------------------------*/
+package org.csystem.app;
+
+class App {
+    public static void main(String [] args)
+    {
+        A<Boolean, String> x;
+        A<Integer, Float> y;
+
+        x = new A<>(); //Since Java 7 : Diamond syntax
+        y = new A<>();
+
+        //...
+    }
+}
+
+class A<T, K> {
+    //...
+}
+
+
+/*----------------------------------------------------------------------------------------------------------------------
+	Generic parametreler için Object kullanılacaksa, Object açılımı yapılması iyi bir tekniktir. Yani generic sınıflar
+	açılımsız kullanılmamalıdır
+----------------------------------------------------------------------------------------------------------------------*/
+class App {
+    public static void main(String [] args)
+    {
+        A<Object> x = new A<>();
+
+        //...
+    }
+}
+
+class A<T> {
+    //...
+}
+/*----------------------------------------------------------------------------------------------------------------------
+	Generic sınıfların generic parametrelerinin kullanımı
+----------------------------------------------------------------------------------------------------------------------*/
+package org.csystem.app;
+
+abstract class A<T, R> {
+    public abstract R get(T t);
+    //...
+}
+
+/*----------------------------------------------------------------------------------------------------------------------
+	Generic bir sınıf generic olmayan bir sınıftan türetilebilir. Bu durumda generic sınıfın her açılımı o taban sınıftan
+	türetilmiş olur
+----------------------------------------------------------------------------------------------------------------------*/
+package org.csystem.app;
+
+class App {
+	public static void main(String [] args)
+	{
+		B<Boolean> bb = new B<>();
+		B<String> bs = new B<>();
+
+		A x;
+
+		x = bs;
+		x = bb;
+
+		//...
+	}
+}
+
+
+class B<T> extends A {
+	//
+}
+
+
+class A {
+	//...
+}
+/*----------------------------------------------------------------------------------------------------------------------
+	Generic olmayan bir sınıf generic bir sınıfın herhangi bir açılımından türetilebilir
+----------------------------------------------------------------------------------------------------------------------*/
+
+/*----------------------------------------------------------------------------------------------------------------------
+	Generic bir sınıf başka bir generic sınıfın bir açılımından türetilebilir
+----------------------------------------------------------------------------------------------------------------------*/
+
+/*----------------------------------------------------------------------------------------------------------------------
+	Generic bir sınıf başka bir generic sınıftan türetilebilir. Bu durumda türemiş sınıfın her açılımı taban sınıfın o
+    açılımından türetilmiş olur
+----------------------------------------------------------------------------------------------------------------------*/
+
+
+/*----------------------------------------------------------------------------------------------------------------------
+	Aşağıdaki örnekte x' in türünden dolayı A<Boolean> açılımına atanamaz
+----------------------------------------------------------------------------------------------------------------------*/
+package org.csystem.app;
+
+class App {
+    public static void main(String [] args)
+    {
+        B<Integer, String> x = new B<>();
+        A<Boolean> y = x; //error
+
+        //...
+    }
+}
+
+class A<T> {
+    public void foo(T t)
+    {
+        System.out.println(t);
+    }
+}
+
+class B<T, K> extends A<K> {
+    public void bar(T t, K k)
+    {
+        System.out.println(t);
+    }
+}
+
+
+/*----------------------------------------------------------------------------------------------------------------------
+	Çalışma zamanı sırasında generic bir sınıfın her açılımı aynı türdendir. Yani sınıf generic bile olsa o sınıfa
+	ilişkin tek bir tür bulunmaktadır
+----------------------------------------------------------------------------------------------------------------------*/
+package org.csystem.app;
+
+class App {
+    public static void main(String [] args)
+    {
+        A<String> as = new A<>();
+        A<Integer> ai = new A<>();
+        A<Boolean> ab = new A<>();
+
+        System.out.println(as.getClass().getName());
+        System.out.println(ab.getClass().getName());
+        System.out.println(ai.getClass().getName());
+    }
+}
+
+class A<T> {
+    //...
+
+/*----------------------------------------------------------------------------------------------------------------------
+	Generic parametrelere kısıt (constraint) verilebilir. Bu işlem için extends anahtar sözcüğü kullanılır. Aşağıdaki
+	örnekte Mample sınıfı IX arayüzünü destekleyen bir tür ile açılabilir. Burada aslında Mample sınıfının generic
+	parametresi için bir üst sınır verilmiştir
+----------------------------------------------------------------------------------------------------------------------*/
+package org.csystem.app;
+
+class App {
+    public static void main(String [] args)
+    {
+        Mample<Sample> m;
+        Mample<Integer> m1; //error
+        //...
+    }
+}
+
+class Mample<T extends IX> {<T extends IX,Iz> cogul olur mu?
+    //..
+    public void bar(T t)
+    {
+        t.foo();
+    }
+}
+
+class Sample implements IX {
+    public void foo()
+    {
+        System.out.println("Sample.foo");
+    }
+}
+
+interface IX {
+    void foo();
+}
+
+/*----------------------------------------------------------------------------------------------------------------------
+	Generic bir sınıfın türemiş sınıf açılımı aynı generic sınıfın taban sınıf açılımına doğrudan atanamaz (invariant)
+----------------------------------------------------------------------------------------------------------------------*/
+package org.csystem.app;
+
+import java.util.ArrayList;
+<T extends IX> öyle bir sinif olsun IX onun taban sinif olsun
+class App {
+    public static void main(String [] args)
+    {
+        ArrayList<Integer> list = new ArrayList<>();
+
+        for (int i = 0; i < 10; ++i)
+            list.add(i * 10);
+
+        Sample.display(list); //error yani upcasting yapamazsin gibi bir durum
+    }
+}
+
+class Sample {
+    public static void display(ArrayList<Number> list)
+    {
+        for (Number n : list)
+            System.out.println(n);
+    }
+}
+
+/*----------------------------------------------------------------------------------------------------------------------
+	enum türleri ve exception sınıfları generic olarak bildirilemez
+----------------------------------------------------------------------------------------------------------------------*/
+
+/*----------------------------------------------------------------------------------------------------------------------
+	Generic metotlar: Java'da metotlar generic olarak yazılabilir. Bu durumda generic parametreler metodun parametreleri
+	ve geri dönüş değeri türü için kullanılabilmektedir.
+----------------------------------------------------------------------------------------------------------------------*/
+/*----------------------------------------------------------------------------------------------------------------------
+	Generic metotlar için generic parametreler geri dönüş değerinden önce açısal parantez içerisinde bildirilmelidir.
+	Generic metotların çağrısında generic parametre ya da parametrelerin türleri geçilen argümana göre tespit
+	edilebiliyorsa (type deduction, type inference)	çağrı tür belirtmeden de yapılabilir. Eğer çağrıda tür ya da
+	türler belirtilecekse, metot isminden önce yine açısal parantez içerisinde belirtilmelidir
+----------------------------------------------------------------------------------------------------------------------*/
+
+/*----------------------------------------------------------------------------------------------------------------------
+	Generic parametre türü new operatörü ile kullanılamaz
+----------------------------------------------------------------------------------------------------------------------*/
+package org.csystem.app;
+
+class Sample<T> {
+    private T m_t;
+
+    public Sample(int n)
+    {
+        m_t = new T(); //error
+    }
+}
